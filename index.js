@@ -18,28 +18,28 @@ server.listen(process.env.PORT || 3000);
 // APIコールのためのクライアントインスタンスを作成
 const bot = new line.Client(line_config);
 
-// ---------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // ルーター設定
-server.post('/webhook', line middleware(line_config), (req, res, next) =>{
-  // 先行してLINE側にステータスコード200でレスポンスする。
-  res.sendStatus(200);
+server.post('/webhook', line.middleware(line_config), (req, res, next) => {
+    // 先行してLINE側にステータスコード200でレスポンスする。
+    res.sendStatus(200);
 
-  // すべてのイベント処理のプロミスを格納する配列。
-  let events_processed = [];
+    // すべてのイベント処理のプロミスを格納する配列。
+    let events_processed = [];
 
-  // イベントオブジェクトを順次処理。
-  req.body.events.forEach((event) => {
-    // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
-    if (event.type == "message" && event.message.type == "text"){
-      // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
+    // イベントオブジェクトを順次処理。
+    req.body.events.forEach((event) => {
+        // この処理の対象をイベントタイプがメッセージで、かつ、テキストタイプだった場合に限定。
+        if (event.type == "message" && event.message.type == "text"){
+            // ユーザーからのテキストメッセージが「こんにちは」だった場合のみ反応。
             if (event.message.text == "こんにちは"){
-              // replyMessage()で返信し、そのプロミスをevents_processedに追加。
+                // replyMessage()で返信し、そのプロミスをevents_processedに追加。
                 events_processed.push(bot.replyMessage(event.replyToken, {
                     type: "text",
                     text: "やあ"
                 }));
-              }
             }
+        }
     });
 
     // すべてのイベント処理が終了したら何個のイベントが処理されたか出力。
@@ -48,5 +48,4 @@ server.post('/webhook', line middleware(line_config), (req, res, next) =>{
             console.log(`${response.length} event(s) processed.`);
         }
     );
-
 });
